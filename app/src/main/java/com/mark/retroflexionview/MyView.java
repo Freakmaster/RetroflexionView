@@ -7,27 +7,17 @@ import android.graphics.Camera;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
 /**
  * 自定义翻转View
- * Created by mark.leihao on 2016/8/5.
+ * Created by mark on 2016/8/5.
  */
 
 public class MyView extends View {
 
     private Context context;
-    /**
-     * 圆心坐标x
-     */
-    float o_x;
-
-    /**
-     * 圆心坐标y
-     */
-    float o_y;
 
     /**
      * 图片的宽度
@@ -49,9 +39,6 @@ public class MyView extends View {
      */
     float maxheight;
 
-    /**
-     * 圆环
-     */
     Bitmap ring;
 
     private Matrix matrix;
@@ -70,29 +57,29 @@ public class MyView extends View {
         height = ring.getHeight();
         maxwidth = (float) Math.sqrt(width * width + height * height);
         maxheight = maxwidth;
-        o_x = maxwidth / 2;
-        o_y = maxheight / 2;
         matrix = new Matrix();
         camera = new Camera();
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
+        maxwidth = getWidth();
+        maxheight = getHeight();
         camera.save();
-        camera.translate(-width / 2, -height / 2, 100);
+        // 绕X轴旋转
         camera.rotateX(-deltaDegree / 100);
         camera.getMatrix(matrix);
         camera.restore();
-        matrix.preTranslate(0, -height / 2);
-        matrix.postTranslate(maxwidth / 2, (maxheight - height) / 2);
+        // 旋转前将图片中心移动到原点
+        matrix.preTranslate(-width / 2, -height / 2);
+        // 旋转后将图片移动到view中心
+        matrix.postTranslate(maxwidth / 2, maxheight / 2);
         canvas.drawBitmap(ring, matrix, null);
     }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         setMeasuredDimension((int) maxwidth, (int) maxheight);
-        Log.i("MyView", "maxwidth = " + maxwidth + ", maxheight = " + maxheight + ", o_x = " + o_x + ", o_y = " + o_y);
     }
 
     float lastMouseY;
@@ -114,4 +101,5 @@ public class MyView extends View {
         invalidate();
         return true;
     }
+
 }
